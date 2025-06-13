@@ -1,63 +1,80 @@
-window.addEventListener('DOMContentLoaded', () => {
-  const startBtn = document.getElementById('start-btn');
-  const captureBtn = document.getElementById('capture-btn');
-  const pdfBtn = document.getElementById('pdf-btn');
-  const video = document.getElementById('video');
-  const canvas = document.getElementById('canvas');
-  const preview = document.getElementById('preview');
-  let imageData = '';
-  let coords = 'Ubicación no disponible';
+let video = document.getElementById("video");
+let canvas = document.getElementById("canvas");
+let captureBtn = document.getElementById("capture-btn");
+let startBtn = document.getElementById("start-btn");
+let pdfBtn = document.getElementById("pdf-btn");
+let resetBtn = document.getElementById("reset-btn");
+let filenameInput = document.getElementById("filename");
+let thumbnailsDiv = document.getElementById("photo-thumbnails");
 
-  // Iniciar cámara
-  startBtn.addEventListener('click', async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      video.srcObject = stream;
-      captureBtn.disabled = false;
-      startBtn.disabled = true;
-    } catch (err) {
-      alert('Error al acceder a la cámara: ' + err.message);
-    }
+let photos = [];
+let currentPosition = null;
+
+navigator.geolocation.getCurrentPosition(
+  (pos) => currentPosition = pos.coords,
+  () => alert("No se pudo obtener ubicación")
+);
+
+startBtn.onclick = async () => {
+  try {
+    const constraints = {
+      video: {
+        facingMode: { exact: "environment" }
+      },
+      audio: false
+    };
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    video.srcObject = stream;
+    captureBtn.disabled = false;
+  } catch (err) {
+    alert("Error accediendo a la cámara: " + err.message);
+  }
+};
+
+captureBtn.onclick = () => {
+  const context = canvas.getContext("2d");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  context.drawImage(video, 0, 0);
+
+  const now = new Date();
+  const timestamp = now.toLocaleString();
+  const coords = currentPosition
+    ? `${currentPosition.latitude.toFixed(6)}, ${currentPosition.longitude.toFixed(6)}`
+    : "Ubicación no disponible";
+
+  context.fillStyle = "white";
+  context.font = "20px Arial";
+  context.fillText(timestamp, 10, canvas.height - 40);
+  context.fillText(coords, 10, canvas.height - 15);
+
+  const imgData = canvas.toDataURL("image/jpeg");
+  photos.push({ imgData, timestamp, coords });
+
+  const thumb = document.createElement("img");
+  thumb.src = imgData;
+  thumbnailsDiv.appendChild(thumb);
+
+  pdfBtn.disabled = false;
+};
+
+pdfBtn.onclick = () => {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  photos.forEach((photo, index) => {
+    if (index !== 0) doc.addPage();
+    doc.text(`Foto ${index + 1}`, 10, 10);
+    doc.addImage(photo.imgData, "JPEG", 10, 20, 180, 135);
   });
 
-  // Capturar foto y ubicación
-  captureBtn.addEventListener('click', () => {
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0);
-    imageData = canvas.toDataURL('image/jpeg');
-    preview.src = imageData;
-    pdfBtn.disabled = false;
+  const name = filenameInput.value.trim() || "fotos_gps";
+  doc.save(name + ".pdf");
+};
 
-    // Obtener ubicación
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          coords = `Lat: ${latitude.toFixed(6)}, Lon: ${longitude.toFixed(6)}`;
-        },
-        (error) => {
-          console.warn('Error al obtener ubicación:', error.message);
-        }
-      );
-    }
-  });
-
-  // Generar PDF
-  pdfBtn.addEventListener('click', async () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const filename = (document.getElementById('filename').value || 'foto') + '.pdf';
-    const timestamp = new Date().toLocaleString();
-
-    doc.setFontSize(12);
-    doc.text(`Fecha y hora: ${timestamp}`, 10, 10);
-    doc.text(`Ubicación: ${coords}`, 10, 20);
-    if (imageData) {
-      doc.addImage(imageData, 'JPEG', 10, 30, 180, 120);
-    }
-    doc.save(filename);
-  });
-});
+resetBtn.onclick = () => {
+  thumbnailsDiv.innerHTML = "";
+  photos = [];
+  pdfBtn.disabled = true;
+};
 
