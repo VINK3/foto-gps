@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Foto GPS PDF</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -12,61 +13,17 @@
     <input type="text" id="filename" placeholder="Nombre del archivo PDF" />
     <button id="start-btn">Iniciar Cámara</button>
     <button id="capture-btn" disabled>Tomar Foto</button>
+    <button id="pdf-btn" disabled>Generar PDF</button>
+    <button id="reset-btn">Reiniciar</button>
+
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas" style="display:none"></canvas>
     <img id="preview" alt="Foto previa"/>
-    <br />
-    <button id="pdf-btn" disabled>Generar PDF</button>
+
+    <div id="photo-thumbnails"></div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const startBtn = document.getElementById('start-btn');
-      const captureBtn = document.getElementById('capture-btn');
-      const pdfBtn = document.getElementById('pdf-btn');
-      const video = document.getElementById('video');
-      const canvas = document.getElementById('canvas');
-      const preview = document.getElementById('preview');
-      let imageData = '';
-      let coords = '';
-
-      startBtn.addEventListener('click', async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-          video.srcObject = stream;
-          captureBtn.disabled = false;
-          startBtn.disabled = true;
-        } catch (err) {
-          alert('Error al iniciar cámara: ' + err.message);
-        }
-      });
-
-      captureBtn.addEventListener('click', () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        imageData = canvas.toDataURL('image/jpeg');
-        preview.src = imageData;
-        pdfBtn.disabled = false;
-        navigator.geolocation.getCurrentPosition(
-          pos => { coords = `Lat:${pos.coords.latitude.toFixed(5)}, Lon:${pos.coords.longitude.toFixed(5)}`; },
-          () => { coords = 'Ubicación no disponible'; }
-        );
-      });
-
-      pdfBtn.addEventListener('click', async () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const fileName = (document.getElementById('filename').value || 'foto') + '.pdf';
-        const dateTime = new Date().toLocaleString();
-        doc.setFontSize(12);
-        doc.text(`Fecha y hora: ${dateTime}`, 10, 10);
-        doc.text(`Ubicación: ${coords}`, 10, 20);
-        if (imageData) doc.addImage(imageData, 'JPEG', 10, 30, 180, 120);
-        doc.save(fileName);
-      });
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
+
