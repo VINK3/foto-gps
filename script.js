@@ -89,6 +89,7 @@ pdfBtn.onclick = () => {
   const formElement = document.querySelector(".container");
   const filename = filenameInput.value.trim() || "inspeccion";
 
+  document.querySelectorAll(".accordion").forEach(a => a.classList.add("active"));
   html2canvas(formElement).then(canvas => {
     const imgData = canvas.toDataURL("image/png");
     const doc = new jsPDF("p", "mm", "a4");
