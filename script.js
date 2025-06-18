@@ -1,3 +1,5 @@
+// script.js
+
 let video = document.getElementById("video");
 let canvas = document.getElementById("canvas");
 let captureBtn = document.getElementById("capture-btn");
@@ -86,44 +88,56 @@ pdfBtn.onclick = () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p", "mm", "a4");
 
-  // Validar formulario
-  const requiredFields = [
-    "nombre", "apellidos", "dni", "codigo", "departamento",
-    "provincia", "distrito", "localidad", "utm-este",
-    "utm-norte", "zona", "telefono", "inspector"
-  ];
-  for (const id of requiredFields) {
-    if (!document.getElementById(id).value.trim()) {
-      alert("Por favor, completa todos los campos del formulario.");
-      return;
-    }
-  }
-
-  const data = requiredFields.reduce((acc, id) => {
-    acc[id] = document.getElementById(id).value.trim();
-    return acc;
-  }, {});
-
-  // Firma
   const firmaImg = firmaCanvas.toDataURL("image/png");
 
-  // Página 1 - Datos
-  doc.setFontSize(12);
-  doc.text(`Nombre: ${data.nombre} ${data.apellidos}`, 10, 20);
-  doc.text(`DNI: ${data.dni}`, 10, 30);
-  doc.text(`Código de Usuario: ${data.codigo}`, 10, 40);
-  doc.text(`Departamento: ${data.departamento}`, 10, 50);
-  doc.text(`Provincia: ${data.provincia}`, 10, 60);
-  doc.text(`Distrito: ${data.distrito}`, 10, 70);
-  doc.text(`Localidad: ${data.localidad}`, 10, 80);
-  doc.text(`Coordenadas UTM: Este ${data["utm-este"]}, Norte ${data["utm-norte"]}`, 10, 90);
-  doc.text(`Zona UTM: ${data.zona}`, 10, 100);
-  doc.text(`Teléfono: ${data.telefono}`, 10, 110);
-  doc.text(`Inspector: ${data.inspector}`, 10, 120);
-  doc.text("Firma del inspector:", 10, 130);
-  doc.addImage(firmaImg, "PNG", 10, 135, 80, 40);
+  const getValue = (id) => document.getElementById(id)?.value.trim() || "";
+  const getRadioValue = (name) => {
+    const radios = document.getElementsByName(name);
+    for (let radio of radios) {
+      if (radio.checked) return radio.value;
+    }
+    return "";
+  };
 
-  // Fotos
+  const campos = {
+    nombre: getValue("nombre"),
+    apellidos: getValue("apellidos"),
+    dni: getValue("dni"),
+    telefono: getValue("telefono"),
+    codigo: getValue("codigo"),
+    departamento: getValue("departamento"),
+    provincia: getValue("provincia"),
+    distrito: getValue("distrito"),
+    localidad: getValue("localidad"),
+    utmEste: getValue("utm-este"),
+    utmNorte: getValue("utm-norte"),
+    zona: getValue("zona"),
+    anio: getValue("anio"),
+    funciona: getRadioValue("funciona"),
+    componentes: getValue("componentes"),
+    lecturaBateria: getValue("lectura-bateria"),
+    observacionesDatos: getValue("observaciones-datos"),
+    respuestaUsuario: getValue("respuesta-usuario"),
+    comentariosUsuario: getValue("comentarios-usuario"),
+    anotaciones: getValue("anotaciones"),
+    inspector: getValue("inspector")
+  };
+
+  let y = 20;
+  doc.setFontSize(12);
+  for (const [key, value] of Object.entries(campos)) {
+    if (y > 270) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.text(`${key}: ${value}`, 10, y);
+    y += 8;
+  }
+
+  doc.text("Firma del inspector:", 10, y);
+  doc.addImage(firmaImg, "PNG", 10, y + 5, 80, 40);
+  y += 50;
+
   photos.forEach((photo, index) => {
     doc.addPage();
     doc.setFontSize(14);
@@ -131,7 +145,7 @@ pdfBtn.onclick = () => {
     doc.addImage(photo.imgData, "JPEG", 10, 20, 180, 135);
   });
 
-  const name = filenameInput.value.trim() || "fotos_gps";
+  const name = filenameInput.value.trim() || "inspeccion";
   doc.save(name + ".pdf");
 };
 
@@ -141,5 +155,3 @@ resetBtn.onclick = () => {
   pdfBtn.disabled = true;
   firmaCtx.clearRect(0, 0, firmaCanvas.width, firmaCanvas.height);
 };
-
-
