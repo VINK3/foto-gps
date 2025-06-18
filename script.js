@@ -90,39 +90,20 @@ pdfBtn.onclick = () => {
 
   const firmaImg = firmaCanvas.toDataURL("image/png");
 
-  const getValue = (id) => document.getElementById(id)?.value.trim() || "";
-  const getRadioValue = (name) => {
-    const radios = document.getElementsByName(name);
-    for (let radio of radios) {
-      if (radio.checked) return radio.value;
+  // Recoger todos los campos dinámicos del formulario generado
+  const campos = {};
+  document.querySelectorAll("#inspection-form input, #inspection-form textarea, #inspection-form select").forEach(input => {
+    if (input.type === "radio") {
+      if (input.checked) {
+        campos[input.name] = input.value;
+      }
+    } else {
+      const key = input.id || input.name;
+      if (key) campos[key] = input.value.trim();
     }
-    return "";
-  };
+  });
 
-  const campos = {
-    nombre: getValue("nombre"),
-    apellidos: getValue("apellidos"),
-    dni: getValue("dni"),
-    telefono: getValue("telefono"),
-    codigo: getValue("codigo"),
-    departamento: getValue("departamento"),
-    provincia: getValue("provincia"),
-    distrito: getValue("distrito"),
-    localidad: getValue("localidad"),
-    utmEste: getValue("utm-este"),
-    utmNorte: getValue("utm-norte"),
-    zona: getValue("zona"),
-    anio: getValue("anio"),
-    funciona: getRadioValue("funciona"),
-    componentes: getValue("componentes"),
-    lecturaBateria: getValue("lectura-bateria"),
-    observacionesDatos: getValue("observaciones-datos"),
-    respuestaUsuario: getValue("respuesta-usuario"),
-    comentariosUsuario: getValue("comentarios-usuario"),
-    anotaciones: getValue("anotaciones"),
-    inspector: getValue("inspector")
-  };
-
+  // Generar la primera página con datos
   let y = 20;
   doc.setFontSize(12);
   for (const [key, value] of Object.entries(campos)) {
