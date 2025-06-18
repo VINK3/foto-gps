@@ -9,7 +9,26 @@
 </head>
 <body>
   <div class="container">
-    <h1>Foto con GPS y PDF</h1>
+    <h1>Protocolo de Inspección</h1>
+    <form id="data-form">
+      <input type="text" id="nombre" placeholder="Nombres" required />
+      <input type="text" id="apellidos" placeholder="Apellidos" required />
+      <input type="text" id="dni" placeholder="DNI" required />
+      <input type="text" id="codigo" placeholder="Código de Usuario" required />
+      <input type="text" id="departamento" placeholder="Departamento" required />
+      <input type="text" id="provincia" placeholder="Provincia" required />
+      <input type="text" id="distrito" placeholder="Distrito" required />
+      <input type="text" id="localidad" placeholder="Localidad" required />
+      <input type="text" id="utm-este" placeholder="Coordenada UTM Este" required />
+      <input type="text" id="utm-norte" placeholder="Coordenada UTM Norte" required />
+      <input type="text" id="zona" placeholder="Zona UTM" required />
+      <input type="text" id="telefono" placeholder="Teléfono del usuario" required />
+      <input type="text" id="inspector" placeholder="Nombre del inspector" required />
+      <label>Firma del inspector:</label><br />
+      <canvas id="firma-canvas" width="300" height="150" style="border:1px solid #fff; background:#fff;"></canvas>
+      <button type="button" id="clear-firma">Borrar Firma</button>
+    </form>
+
     <input type="text" id="filename" placeholder="Nombre del archivo PDF" />
     <button id="start-btn">Iniciar Cámara</button>
     <button id="capture-btn" disabled>Tomar Foto</button>
