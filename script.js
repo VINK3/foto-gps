@@ -1,4 +1,4 @@
-// script.js
+// script.js con html2canvas para capturar formulario
 
 let video = document.getElementById("video");
 let canvas = document.getElementById("canvas");
@@ -86,48 +86,31 @@ captureBtn.onclick = () => {
 
 pdfBtn.onclick = () => {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF("p", "mm", "a4");
+  const formElement = document.querySelector(".container");
+  const filename = filenameInput.value.trim() || "inspeccion";
 
-  const firmaImg = firmaCanvas.toDataURL("image/png");
+  html2canvas(formElement).then(canvas => {
+    const imgData = canvas.toDataURL("image/png");
+    const doc = new jsPDF("p", "mm", "a4");
 
-  // Recoger todos los campos dinámicos del formulario generado
-  const campos = {};
-  document.querySelectorAll("#inspection-form input, #inspection-form textarea, #inspection-form select").forEach(input => {
-    if (input.type === "radio") {
-      if (input.checked) {
-        campos[input.name] = input.value;
-      }
-    } else {
-      const key = input.id || input.name;
-      if (key) campos[key] = input.value.trim();
-    }
-  });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const imgProps = doc.getImageProperties(imgData);
+    const pdfWidth = pageWidth;
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-  // Generar la primera página con datos
-  let y = 20;
-  doc.setFontSize(12);
-  for (const [key, value] of Object.entries(campos)) {
-    if (y > 270) {
+    doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+    // Fotos georreferenciadas
+    photos.forEach((photo, index) => {
       doc.addPage();
-      y = 20;
-    }
-    doc.text(`${key}: ${value}`, 10, y);
-    y += 8;
-  }
+      doc.setFontSize(14);
+      doc.text(`Foto ${index + 1}`, 10, 10);
+      doc.addImage(photo.imgData, "JPEG", 10, 20, 180, 135);
+    });
 
-  doc.text("Firma del inspector:", 10, y);
-  doc.addImage(firmaImg, "PNG", 10, y + 5, 80, 40);
-  y += 50;
-
-  photos.forEach((photo, index) => {
-    doc.addPage();
-    doc.setFontSize(14);
-    doc.text(`Foto ${index + 1}`, 10, 10);
-    doc.addImage(photo.imgData, "JPEG", 10, 20, 180, 135);
+    doc.save(filename + ".pdf");
   });
-
-  const name = filenameInput.value.trim() || "inspeccion";
-  doc.save(name + ".pdf");
 };
 
 resetBtn.onclick = () => {
