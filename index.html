@@ -1,140 +1,113 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Foto GPS PDF</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <style>
-    .accordion { margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 5px; overflow: hidden; }
-    .accordion-toggle { width: 100%; background: #004080; color: white; padding: 10px; font-weight: bold; text-align: left; border: none; cursor: pointer; }
-    .accordion-content { display: none; padding: 10px; background: rgba(255, 255, 255, 0.9); }
-    .accordion.active .accordion-content { display: block; }
-    form label { display: block; margin-top: 10px; }
-    form input, form textarea, form select { width: 100%; padding: 5px; margin-top: 5px; }
-  </style>
+  <meta charset="UTF-8">
+  <title>Inspección RER Autónoma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Protocolo de Inspección</h1>
 
-    <!-- Acordeón 1: Datos del Usuario -->
-    <div class="accordion">
-      <button class="accordion-toggle">1. DATOS DEL USUARIO</button>
-      <div class="accordion-content">
-        <label for="nombre">Nombres:</label>
-        <input type="text" id="nombre" required />
-        <label for="apellidos">Apellidos:</label>
-        <input type="text" id="apellidos" required />
-        <label for="dni">DNI:</label>
-        <input type="text" id="dni" required />
-        <label for="telefono">Teléfono:</label>
-        <input type="text" id="telefono" required />
-        <label for="codigo">Código de Usuario:</label>
-        <input type="text" id="codigo" required />
-      </div>
-    </div>
+<div class="container">
+  <h1>Formulario de Inspección RER Autónoma</h1>
+  <input type="text" id="filename" placeholder="Nombre del archivo PDF" required />
 
-    <!-- Acordeón 2: Localización -->
-    <div class="accordion">
-      <button class="accordion-toggle">2. LOCALIZACIÓN DE LA INSTALACIÓN RER AUTÓNOMA</button>
-      <div class="accordion-content">
-        <label for="departamento">Departamento:</label>
-        <input type="text" id="departamento" required />
-        <label for="provincia">Provincia:</label>
-        <input type="text" id="provincia" required />
-        <label for="distrito">Distrito:</label>
-        <input type="text" id="distrito" required />
-        <label for="localidad">Localidad:</label>
-        <input type="text" id="localidad" required />
-        <label for="utm-este">Coordenada UTM Este:</label>
-        <input type="text" id="utm-este" required />
-        <label for="utm-norte">Coordenada UTM Norte:</label>
-        <input type="text" id="utm-norte" required />
-        <label for="zona">Zona UTM:</label>
-        <input type="text" id="zona" required />
-      </div>
-    </div>
+  <form id="inspection-form">
+    <!-- Acordeón generado dinámicamente -->
+    <!-- Aquí se insertarán las secciones -->
+  </form>
 
-    <!-- Acordeón 3: Datos principales instalación -->
-    <div class="accordion">
-      <button class="accordion-toggle">3. DATOS PRINCIPALES DE LA INSTALACIÓN RER AUTÓNOMA</button>
-      <div class="accordion-content">
-        <label for="anio">Año de instalación:</label>
-        <input type="text" id="anio" required />
-        <label>¿Sistema funcionando?:</label>
-        <input type="radio" name="funciona" value="Sí" required> Sí
-        <input type="radio" name="funciona" value="No"> No
-        <label for="componentes">Componentes:</label>
-        <textarea id="componentes" required></textarea>
-      </div>
-    </div>
-
-    <!-- Acordeón 4: Descarga de datos -->
-    <div class="accordion">
-      <button class="accordion-toggle">4. DESCARGA DE DATOS</button>
-      <div class="accordion-content">
-        <label for="lectura-bateria">Lectura de batería:</label>
-        <input type="text" id="lectura-bateria" required />
-        <label for="observaciones-datos">Observaciones:</label>
-        <textarea id="observaciones-datos" required></textarea>
-      </div>
-    </div>
-
-    <!-- Acordeón 5: Anotaciones del usuario -->
-    <div class="accordion">
-      <button class="accordion-toggle">5. ANOTACIONES RESPECTO DE LA INSTALACIÓN RER AUTÓNOMA</button>
-      <div class="accordion-content">
-        <label for="respuesta-usuario">¿Ha tenido fallas?:</label>
-        <select id="respuesta-usuario" required>
-          <option value="">Seleccione</option>
-          <option value="Sí">Sí</option>
-          <option value="No">No</option>
-        </select>
-        <label for="comentarios-usuario">Comentarios del usuario:</label>
-        <textarea id="comentarios-usuario" required></textarea>
-      </div>
-    </div>
-
-    <!-- Acordeón 6: Anotaciones importantes -->
-    <div class="accordion">
-      <button class="accordion-toggle">6. ANOTACIONES IMPORTANTES</button>
-      <div class="accordion-content">
-        <label for="anotaciones">Observaciones adicionales:</label>
-        <textarea id="anotaciones" required></textarea>
-      </div>
-    </div>
-
-    <!-- Firma del inspector -->
-    <label>Nombre del inspector:</label>
-    <input type="text" id="inspector" required />
-    <label>Firma del inspector:</label><br />
-    <canvas id="firma-canvas" width="300" height="150" style="border:1px solid #fff; background:#fff;"></canvas>
-    <button type="button" id="clear-firma">Borrar Firma</button>
-
-    <!-- Funcionalidad fotográfica -->
-    <input type="text" id="filename" placeholder="Nombre del archivo PDF" />
-    <button id="start-btn">Iniciar Cámara</button>
-    <button id="capture-btn" disabled>Tomar Foto</button>
-    <button id="pdf-btn" disabled>Generar PDF</button>
-    <button id="reset-btn">Reiniciar</button>
-
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas" style="display:none"></canvas>
-    <img id="preview" alt="Foto previa"/>
-    <div id="photo-thumbnails"></div>
+  <h2>Firma del Inspector</h2>
+  <canvas id="firma-canvas" width="300" height="100" style="border:1px solid #000"></canvas>
+  <div>
+    <button type="button" id="clear-firma">Limpiar Firma</button>
   </div>
 
-  <script>
-    document.querySelectorAll('.accordion-toggle').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const parent = btn.parentElement;
-        parent.classList.toggle('active');
+  <h2>Fotos georreferenciadas</h2>
+  <video id="video" autoplay></video>
+  <canvas id="canvas" style="display:none;"></canvas>
+  <div>
+    <button type="button" id="start-btn">Activar Cámara</button>
+    <button type="button" id="capture-btn" disabled>Tomar Foto</button>
+    <button type="button" id="reset-btn">Limpiar Fotos</button>
+  </div>
+  <div id="photo-thumbnails"></div>
+
+  <div style="margin-top: 20px;">
+    <button type="button" id="pdf-btn" disabled>Generar PDF</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  // Insertar los acordeones del formulario al cargar
+  window.onload = async () => {
+    const response = await fetch("formulario.json");
+    const formSections = await response.json();
+    const form = document.getElementById("inspection-form");
+
+    formSections.forEach((section, idx) => {
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("accordion");
+
+      const header = document.createElement("button");
+      header.className = "accordion-toggle";
+      header.type = "button";
+      header.innerText = `${idx + 1}. ${section.titulo}`;
+      header.onclick = () => wrapper.classList.toggle("active");
+
+      const content = document.createElement("div");
+      content.className = "accordion-content";
+
+      section.campos.forEach(campo => {
+        const label = document.createElement("label");
+        label.innerText = campo.etiqueta;
+
+        let input;
+        if (campo.tipo === "text" || campo.tipo === "number" || campo.tipo === "date") {
+          input = document.createElement("input");
+          input.type = campo.tipo;
+        } else if (campo.tipo === "textarea") {
+          input = document.createElement("textarea");
+        } else if (campo.tipo === "select") {
+          input = document.createElement("select");
+          campo.opciones.forEach(opt => {
+            const option = document.createElement("option");
+            option.value = opt;
+            option.text = opt;
+            input.appendChild(option);
+          });
+        } else if (campo.tipo === "radio") {
+          input = document.createElement("div");
+          campo.opciones.forEach(opt => {
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = campo.id;
+            radio.value = opt;
+            radio.required = true;
+            const span = document.createElement("span");
+            span.innerText = opt;
+            input.appendChild(radio);
+            input.appendChild(span);
+          });
+        }
+
+        if (input && campo.tipo !== "radio") {
+          input.required = true;
+          input.id = campo.id;
+        }
+
+        content.appendChild(label);
+        content.appendChild(input);
       });
+
+      wrapper.appendChild(header);
+      wrapper.appendChild(content);
+      form.appendChild(wrapper);
     });
-  </script>
-  <script src="script.js"></script>
+  };
+</script>
+
 </body>
 </html>
-
