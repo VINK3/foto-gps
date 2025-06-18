@@ -108,5 +108,102 @@
         ]
       }
     ]
+  },
+  {
+    "titulo": "4. INSPECCIÓN DE COMPONENTES DEL SISTEMA",
+    "campos": [
+      {
+        "id": "estado_modulo_fv",
+        "etiqueta": "4.1. Módulo fotovoltaico - Estado",
+        "tipo": "radio",
+        "opciones": [
+          "En buen estado",
+          "En mal estado",
+          "Inexistente"
+        ]
+      },
+      {
+        "id": "estado_bateria",
+        "etiqueta": "4.2. Batería - Estado",
+        "tipo": "radio",
+        "opciones": [
+          "Operativa",
+          "No operativa",
+          "Robada"
+        ]
+      },
+      {
+        "id": "estado_controlador",
+        "etiqueta": "4.3. Controlador de carga - Estado",
+        "tipo": "radio",
+        "opciones": [
+          "Operativo",
+          "No operativo",
+          "Inexistente"
+        ]
+      }
+    ]
+  },
+  {
+    "titulo": "5. ANOTACIONES DEL USUARIO",
+    "campos": [
+      {
+        "id": "sistema_funciona",
+        "etiqueta": "¿El sistema funciona?",
+        "tipo": "radio",
+        "opciones": [
+          "Sí",
+          "No"
+        ]
+      },
+      {
+        "id": "desde_cuando_no_funciona",
+        "etiqueta": "¿Desde cuándo no funciona?",
+        "tipo": "text"
+      },
+      {
+        "id": "mantenimiento",
+        "etiqueta": "¿Ha recibido mantenimiento?",
+        "tipo": "radio",
+        "opciones": [
+          "Sí",
+          "No"
+        ]
+      },
+      {
+        "id": "material_informativo",
+        "etiqueta": "¿Tiene material informativo del sistema?",
+        "tipo": "radio",
+        "opciones": [
+          "Sí",
+          "No"
+        ]
+      }
+    ]
+  },
+  {
+    "titulo": "6. ANOTACIONES IMPORTANTES",
+    "campos": [
+      {
+        "id": "anotaciones_inspector",
+        "etiqueta": "Observaciones generales del inspector",
+        "tipo": "textarea"
+      }
+    ]
+  },
+  {
+    "titulo": "7. INFORMACIÓN DEL INSPECTOR",
+    "campos": [
+      {
+        "id": "nombre_inspector",
+        "etiqueta": "Nombre del inspector",
+        "tipo": "text"
+      },
+      {
+        "id": "dni_inspector",
+        "etiqueta": "DNI del inspector",
+        "tipo": "number"
+      }
+    ]
   }
 ]
