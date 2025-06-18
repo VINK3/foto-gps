@@ -10,6 +10,30 @@ let thumbnailsDiv = document.getElementById("photo-thumbnails");
 let photos = [];
 let currentPosition = null;
 
+const firmaCanvas = document.getElementById("firma-canvas");
+const firmaCtx = firmaCanvas.getContext("2d");
+let drawing = false;
+
+firmaCanvas.addEventListener("mousedown", e => {
+  drawing = true;
+  firmaCtx.beginPath();
+  firmaCtx.moveTo(e.offsetX, e.offsetY);
+});
+
+firmaCanvas.addEventListener("mousemove", e => {
+  if (drawing) {
+    firmaCtx.lineTo(e.offsetX, e.offsetY);
+    firmaCtx.stroke();
+  }
+});
+
+firmaCanvas.addEventListener("mouseup", () => drawing = false);
+firmaCanvas.addEventListener("mouseleave", () => drawing = false);
+
+document.getElementById("clear-firma").onclick = () => {
+  firmaCtx.clearRect(0, 0, firmaCanvas.width, firmaCanvas.height);
+};
+
 navigator.geolocation.getCurrentPosition(
   (pos) => currentPosition = pos.coords,
   () => alert("No se pudo obtener ubicación")
@@ -60,10 +84,49 @@ captureBtn.onclick = () => {
 
 pdfBtn.onclick = () => {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  const doc = new jsPDF("p", "mm", "a4");
 
+  // Validar formulario
+  const requiredFields = [
+    "nombre", "apellidos", "dni", "codigo", "departamento",
+    "provincia", "distrito", "localidad", "utm-este",
+    "utm-norte", "zona", "telefono", "inspector"
+  ];
+  for (const id of requiredFields) {
+    if (!document.getElementById(id).value.trim()) {
+      alert("Por favor, completa todos los campos del formulario.");
+      return;
+    }
+  }
+
+  const data = requiredFields.reduce((acc, id) => {
+    acc[id] = document.getElementById(id).value.trim();
+    return acc;
+  }, {});
+
+  // Firma
+  const firmaImg = firmaCanvas.toDataURL("image/png");
+
+  // Página 1 - Datos
+  doc.setFontSize(12);
+  doc.text(`Nombre: ${data.nombre} ${data.apellidos}`, 10, 20);
+  doc.text(`DNI: ${data.dni}`, 10, 30);
+  doc.text(`Código de Usuario: ${data.codigo}`, 10, 40);
+  doc.text(`Departamento: ${data.departamento}`, 10, 50);
+  doc.text(`Provincia: ${data.provincia}`, 10, 60);
+  doc.text(`Distrito: ${data.distrito}`, 10, 70);
+  doc.text(`Localidad: ${data.localidad}`, 10, 80);
+  doc.text(`Coordenadas UTM: Este ${data["utm-este"]}, Norte ${data["utm-norte"]}`, 10, 90);
+  doc.text(`Zona UTM: ${data.zona}`, 10, 100);
+  doc.text(`Teléfono: ${data.telefono}`, 10, 110);
+  doc.text(`Inspector: ${data.inspector}`, 10, 120);
+  doc.text("Firma del inspector:", 10, 130);
+  doc.addImage(firmaImg, "PNG", 10, 135, 80, 40);
+
+  // Fotos
   photos.forEach((photo, index) => {
-    if (index !== 0) doc.addPage();
+    doc.addPage();
+    doc.setFontSize(14);
     doc.text(`Foto ${index + 1}`, 10, 10);
     doc.addImage(photo.imgData, "JPEG", 10, 20, 180, 135);
   });
@@ -76,5 +139,7 @@ resetBtn.onclick = () => {
   thumbnailsDiv.innerHTML = "";
   photos = [];
   pdfBtn.disabled = true;
+  firmaCtx.clearRect(0, 0, firmaCanvas.width, firmaCanvas.height);
 };
+
 
