@@ -6,29 +6,114 @@
   <title>Foto GPS PDF</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <style>
+    .accordion { margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 5px; overflow: hidden; }
+    .accordion-toggle { width: 100%; background: #004080; color: white; padding: 10px; font-weight: bold; text-align: left; border: none; cursor: pointer; }
+    .accordion-content { display: none; padding: 10px; background: rgba(255, 255, 255, 0.9); }
+    .accordion.active .accordion-content { display: block; }
+    form label { display: block; margin-top: 10px; }
+    form input, form textarea, form select { width: 100%; padding: 5px; margin-top: 5px; }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>Protocolo de Inspección</h1>
-    <form id="data-form">
-      <input type="text" id="nombre" placeholder="Nombres" required />
-      <input type="text" id="apellidos" placeholder="Apellidos" required />
-      <input type="text" id="dni" placeholder="DNI" required />
-      <input type="text" id="codigo" placeholder="Código de Usuario" required />
-      <input type="text" id="departamento" placeholder="Departamento" required />
-      <input type="text" id="provincia" placeholder="Provincia" required />
-      <input type="text" id="distrito" placeholder="Distrito" required />
-      <input type="text" id="localidad" placeholder="Localidad" required />
-      <input type="text" id="utm-este" placeholder="Coordenada UTM Este" required />
-      <input type="text" id="utm-norte" placeholder="Coordenada UTM Norte" required />
-      <input type="text" id="zona" placeholder="Zona UTM" required />
-      <input type="text" id="telefono" placeholder="Teléfono del usuario" required />
-      <input type="text" id="inspector" placeholder="Nombre del inspector" required />
-      <label>Firma del inspector:</label><br />
-      <canvas id="firma-canvas" width="300" height="150" style="border:1px solid #fff; background:#fff;"></canvas>
-      <button type="button" id="clear-firma">Borrar Firma</button>
-    </form>
 
+    <!-- Acordeón 1: Datos del Usuario -->
+    <div class="accordion">
+      <button class="accordion-toggle">1. DATOS DEL USUARIO</button>
+      <div class="accordion-content">
+        <label for="nombre">Nombres:</label>
+        <input type="text" id="nombre" required />
+        <label for="apellidos">Apellidos:</label>
+        <input type="text" id="apellidos" required />
+        <label for="dni">DNI:</label>
+        <input type="text" id="dni" required />
+        <label for="telefono">Teléfono:</label>
+        <input type="text" id="telefono" required />
+        <label for="codigo">Código de Usuario:</label>
+        <input type="text" id="codigo" required />
+      </div>
+    </div>
+
+    <!-- Acordeón 2: Localización -->
+    <div class="accordion">
+      <button class="accordion-toggle">2. LOCALIZACIÓN DE LA INSTALACIÓN RER AUTÓNOMA</button>
+      <div class="accordion-content">
+        <label for="departamento">Departamento:</label>
+        <input type="text" id="departamento" required />
+        <label for="provincia">Provincia:</label>
+        <input type="text" id="provincia" required />
+        <label for="distrito">Distrito:</label>
+        <input type="text" id="distrito" required />
+        <label for="localidad">Localidad:</label>
+        <input type="text" id="localidad" required />
+        <label for="utm-este">Coordenada UTM Este:</label>
+        <input type="text" id="utm-este" required />
+        <label for="utm-norte">Coordenada UTM Norte:</label>
+        <input type="text" id="utm-norte" required />
+        <label for="zona">Zona UTM:</label>
+        <input type="text" id="zona" required />
+      </div>
+    </div>
+
+    <!-- Acordeón 3: Datos principales instalación -->
+    <div class="accordion">
+      <button class="accordion-toggle">3. DATOS PRINCIPALES DE LA INSTALACIÓN RER AUTÓNOMA</button>
+      <div class="accordion-content">
+        <label for="anio">Año de instalación:</label>
+        <input type="text" id="anio" required />
+        <label>¿Sistema funcionando?:</label>
+        <input type="radio" name="funciona" value="Sí" required> Sí
+        <input type="radio" name="funciona" value="No"> No
+        <label for="componentes">Componentes:</label>
+        <textarea id="componentes" required></textarea>
+      </div>
+    </div>
+
+    <!-- Acordeón 4: Descarga de datos -->
+    <div class="accordion">
+      <button class="accordion-toggle">4. DESCARGA DE DATOS</button>
+      <div class="accordion-content">
+        <label for="lectura-bateria">Lectura de batería:</label>
+        <input type="text" id="lectura-bateria" required />
+        <label for="observaciones-datos">Observaciones:</label>
+        <textarea id="observaciones-datos" required></textarea>
+      </div>
+    </div>
+
+    <!-- Acordeón 5: Anotaciones del usuario -->
+    <div class="accordion">
+      <button class="accordion-toggle">5. ANOTACIONES RESPECTO DE LA INSTALACIÓN RER AUTÓNOMA</button>
+      <div class="accordion-content">
+        <label for="respuesta-usuario">¿Ha tenido fallas?:</label>
+        <select id="respuesta-usuario" required>
+          <option value="">Seleccione</option>
+          <option value="Sí">Sí</option>
+          <option value="No">No</option>
+        </select>
+        <label for="comentarios-usuario">Comentarios del usuario:</label>
+        <textarea id="comentarios-usuario" required></textarea>
+      </div>
+    </div>
+
+    <!-- Acordeón 6: Anotaciones importantes -->
+    <div class="accordion">
+      <button class="accordion-toggle">6. ANOTACIONES IMPORTANTES</button>
+      <div class="accordion-content">
+        <label for="anotaciones">Observaciones adicionales:</label>
+        <textarea id="anotaciones" required></textarea>
+      </div>
+    </div>
+
+    <!-- Firma del inspector -->
+    <label>Nombre del inspector:</label>
+    <input type="text" id="inspector" required />
+    <label>Firma del inspector:</label><br />
+    <canvas id="firma-canvas" width="300" height="150" style="border:1px solid #fff; background:#fff;"></canvas>
+    <button type="button" id="clear-firma">Borrar Firma</button>
+
+    <!-- Funcionalidad fotográfica -->
     <input type="text" id="filename" placeholder="Nombre del archivo PDF" />
     <button id="start-btn">Iniciar Cámara</button>
     <button id="capture-btn" disabled>Tomar Foto</button>
@@ -38,10 +123,17 @@
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas" style="display:none"></canvas>
     <img id="preview" alt="Foto previa"/>
-
     <div id="photo-thumbnails"></div>
   </div>
 
+  <script>
+    document.querySelectorAll('.accordion-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parent = btn.parentElement;
+        parent.classList.toggle('active');
+      });
+    });
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
