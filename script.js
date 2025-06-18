@@ -1,4 +1,4 @@
-// script.js con html2canvas para capturar formulario
+// script.js estructurado por páginas de encabezados y datos
 
 let video = document.getElementById("video");
 let canvas = document.getElementById("canvas");
@@ -86,32 +86,97 @@ captureBtn.onclick = () => {
 
 pdfBtn.onclick = () => {
   const { jsPDF } = window.jspdf;
-  const formElement = document.querySelector(".container");
+  const doc = new jsPDF("p", "mm", "a4");
+  const firmaImg = firmaCanvas.toDataURL("image/png");
   const filename = filenameInput.value.trim() || "inspeccion";
+  const fecha = new Date().toLocaleDateString();
 
-  document.querySelectorAll(".accordion").forEach(a => a.classList.add("active"));
-  html2canvas(formElement).then(canvas => {
-    const imgData = canvas.toDataURL("image/png");
-    const doc = new jsPDF("p", "mm", "a4");
-
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const imgProps = doc.getImageProperties(imgData);
-    const pdfWidth = pageWidth;
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-    doc.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-
-    // Fotos georreferenciadas
-    photos.forEach((photo, index) => {
-      doc.addPage();
-      doc.setFontSize(14);
-      doc.text(`Foto ${index + 1}`, 10, 10);
-      doc.addImage(photo.imgData, "JPEG", 10, 20, 180, 135);
-    });
-
-    doc.save(filename + ".pdf");
+  const campos = {};
+  document.querySelectorAll("#inspection-form input, #inspection-form textarea, #inspection-form select").forEach(input => {
+    if (input.type === "radio") {
+      if (input.checked) campos[input.name] = input.value;
+    } else {
+      const key = input.id || input.name;
+      if (key) campos[key] = input.value.trim();
+    }
   });
+
+  const secciones = [
+    ["1. DATOS DEL USUARIO", ["nombre", "apellidos", "dni", "telefono", "codigo"]],
+    ["2. LOCALIZACIÓN DE LA INSTALACIÓN RER AUTÓNOMA", ["departamento", "provincia", "distrito", "localidad", "utm-este", "utm-norte", "zona"]],
+    ["3. DATOS PRINCIPALES DE LA INSTALACIÓN RER AUTÓNOMA", ["anio", "funciona", "componentes"]],
+    ["4. DESCARGA DE DATOS", ["lectura-bateria", "observaciones-datos"]],
+    ["5. ANOTACIONES RESPECTO DE LA INSTALACIÓN RER AUTÓNOMA", ["respuesta-usuario", "comentarios-usuario"]],
+    ["6. ANOTACIONES IMPORTANTES", ["anotaciones"]]
+  ];
+
+  // Página 1
+  doc.setFontSize(14);
+  doc.text("FORMATO DE INSPECCIÓN DE INSTALACIÓN RER AUTÓNOMA", 10, 20);
+  doc.setFontSize(11);
+  doc.text(`Fecha de Inspección: ${fecha}`, 10, 30);
+  doc.text(`Código de Usuario: ${campos["codigo"] || ""}`, 10, 40);
+
+  let y = 50;
+  for (let i = 0; i < 2; i++) {
+    const [titulo, claves] = secciones[i];
+    doc.setFont(undefined, "bold");
+    doc.text(titulo, 10, y);
+    doc.setFont(undefined, "normal");
+    y += 7;
+    claves.forEach(key => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.text(`${key}: ${campos[key] || ""}`, 10, y);
+      y += 7;
+    });
+  }
+
+  // Página 2
+  doc.addPage();
+  y = 20;
+  for (let i = 2; i < 4; i++) {
+    const [titulo, claves] = secciones[i];
+    doc.setFont(undefined, "bold");
+    doc.text(titulo, 10, y);
+    doc.setFont(undefined, "normal");
+    y += 7;
+    claves.forEach(key => {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.text(`${key}: ${campos[key] || ""}`, 10, y);
+      y += 7;
+    });
+  }
+
+  // Página 3
+  doc.addPage();
+  y = 20;
+  for (let i = 4; i < 6; i++) {
+    const [titulo, claves] = secciones[i];
+    doc.setFont(undefined, "bold");
+    doc.text(titulo, 10, y);
+    doc.setFont(undefined, "normal");
+    y += 7;
+    claves.forEach(key => {
+      if (y > 250) { doc.addPage(); y = 20; }
+      doc.text(`${key}: ${campos[key] || ""}`, 10, y);
+      y += 7;
+    });
+  }
+
+  // Firma
+  if (y > 230) { doc.addPage(); y = 20; }
+  doc.text("Firma del Inspector:", 10, y);
+  doc.addImage(firmaImg, "PNG", 10, y + 5, 80, 40);
+
+  // Fotos
+  photos.forEach((photo, index) => {
+    doc.addPage();
+    doc.setFontSize(14);
+    doc.text(`Foto ${index + 1}`, 10, 10);
+    doc.addImage(photo.imgData, "JPEG", 10, 20, 180, 135);
+  });
+
+  doc.save(filename + ".pdf");
 };
 
 resetBtn.onclick = () => {
