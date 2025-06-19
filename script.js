@@ -1,4 +1,4 @@
-// script.js estructurado por páginas de encabezados y datos
+// script.js actualizado: PDF estructurado por secciones + firma móvil
 
 let video = document.getElementById("video");
 let canvas = document.getElementById("canvas");
@@ -16,6 +16,15 @@ const firmaCanvas = document.getElementById("firma-canvas");
 const firmaCtx = firmaCanvas.getContext("2d");
 let drawing = false;
 
+function getCoordsTouch(e) {
+  const rect = firmaCanvas.getBoundingClientRect();
+  const touch = e.touches[0];
+  return {
+    x: touch.clientX - rect.left,
+    y: touch.clientY - rect.top
+  };
+}
+
 firmaCanvas.addEventListener("mousedown", e => {
   drawing = true;
   firmaCtx.beginPath();
@@ -31,6 +40,28 @@ firmaCanvas.addEventListener("mousemove", e => {
 
 firmaCanvas.addEventListener("mouseup", () => drawing = false);
 firmaCanvas.addEventListener("mouseleave", () => drawing = false);
+
+// Touch soporte móvil
+firmaCanvas.addEventListener("touchstart", e => {
+  e.preventDefault();
+  drawing = true;
+  const { x, y } = getCoordsTouch(e);
+  firmaCtx.beginPath();
+  firmaCtx.moveTo(x, y);
+});
+
+firmaCanvas.addEventListener("touchmove", e => {
+  e.preventDefault();
+  if (!drawing) return;
+  const { x, y } = getCoordsTouch(e);
+  firmaCtx.lineTo(x, y);
+  firmaCtx.stroke();
+});
+
+firmaCanvas.addEventListener("touchend", e => {
+  e.preventDefault();
+  drawing = false;
+});
 
 document.getElementById("clear-firma").onclick = () => {
   firmaCtx.clearRect(0, 0, firmaCanvas.width, firmaCanvas.height);
@@ -84,7 +115,7 @@ captureBtn.onclick = () => {
   pdfBtn.disabled = false;
 };
 
-pdfBtn.onclick = () => {
+pdfBtn.onclick = async () => {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("p", "mm", "a4");
   const firmaImg = firmaCanvas.toDataURL("image/png");
@@ -101,66 +132,57 @@ pdfBtn.onclick = () => {
     }
   });
 
-  const secciones = [
-    ["1. DATOS DEL USUARIO", ["nombre", "apellidos", "dni", "telefono", "codigo"]],
-    ["2. LOCALIZACIÓN DE LA INSTALACIÓN RER AUTÓNOMA", ["departamento", "provincia", "distrito", "localidad", "utm-este", "utm-norte", "zona"]],
-    ["3. DATOS PRINCIPALES DE LA INSTALACIÓN RER AUTÓNOMA", ["anio", "funciona", "componentes"]],
-    ["4. DESCARGA DE DATOS", ["lectura-bateria", "observaciones-datos"]],
-    ["5. ANOTACIONES RESPECTO DE LA INSTALACIÓN RER AUTÓNOMA", ["respuesta-usuario", "comentarios-usuario"]],
-    ["6. ANOTACIONES IMPORTANTES", ["anotaciones"]]
-  ];
+  const res = await fetch("formulario.json");
+  const secciones = await res.json();
 
-  // Página 1
+  // HOJA 1
   doc.setFontSize(14);
   doc.text("FORMATO DE INSPECCIÓN DE INSTALACIÓN RER AUTÓNOMA", 10, 20);
   doc.setFontSize(11);
   doc.text(`Fecha de Inspección: ${fecha}`, 10, 30);
-  doc.text(`Código de Usuario: ${campos["codigo"] || ""}`, 10, 40);
+  doc.text(`Código de Usuario: ${campos["codigo_usuario"] || ""}`, 10, 40);
 
   let y = 50;
   for (let i = 0; i < 2; i++) {
-    const [titulo, claves] = secciones[i];
     doc.setFont(undefined, "bold");
-    doc.text(titulo, 10, y);
+    doc.text(secciones[i].titulo, 10, y);
     doc.setFont(undefined, "normal");
     y += 7;
-    claves.forEach(key => {
+    for (const campo of secciones[i].campos) {
       if (y > 270) { doc.addPage(); y = 20; }
-      doc.text(`${key}: ${campos[key] || ""}`, 10, y);
+      doc.text(`${campo.etiqueta}: ${campos[campo.id] || ""}`, 10, y);
       y += 7;
-    });
+    }
   }
 
-  // Página 2
+  // HOJA 2
   doc.addPage();
   y = 20;
   for (let i = 2; i < 4; i++) {
-    const [titulo, claves] = secciones[i];
     doc.setFont(undefined, "bold");
-    doc.text(titulo, 10, y);
+    doc.text(secciones[i].titulo, 10, y);
     doc.setFont(undefined, "normal");
     y += 7;
-    claves.forEach(key => {
+    for (const campo of secciones[i].campos) {
       if (y > 270) { doc.addPage(); y = 20; }
-      doc.text(`${key}: ${campos[key] || ""}`, 10, y);
+      doc.text(`${campo.etiqueta}: ${campos[campo.id] || ""}`, 10, y);
       y += 7;
-    });
+    }
   }
 
-  // Página 3
+  // HOJA 3
   doc.addPage();
   y = 20;
-  for (let i = 4; i < 6; i++) {
-    const [titulo, claves] = secciones[i];
+  for (let i = 4; i < secciones.length; i++) {
     doc.setFont(undefined, "bold");
-    doc.text(titulo, 10, y);
+    doc.text(secciones[i].titulo, 10, y);
     doc.setFont(undefined, "normal");
     y += 7;
-    claves.forEach(key => {
+    for (const campo of secciones[i].campos) {
       if (y > 250) { doc.addPage(); y = 20; }
-      doc.text(`${key}: ${campos[key] || ""}`, 10, y);
+      doc.text(`${campo.etiqueta}: ${campos[campo.id] || ""}`, 10, y);
       y += 7;
-    });
+    }
   }
 
   // Firma
