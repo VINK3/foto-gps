@@ -85,30 +85,121 @@
     ]
   },
   {
-    "titulo": "3. DATOS PRINCIPALES DE LA INSTALACIÓN RER AUTÓNOMA",
-    "campos": [
-      {
-        "id": "tipo_instalacion",
-        "etiqueta": "3.1. Tipo de instalación",
-        "tipo": "radio",
-        "opciones": [
-          "RER TIPO 1",
-          "RER TIPO 2",
-          "RER TIPO 3"
-        ]
-      },
-      {
-        "id": "ubicacion_instalacion",
-        "etiqueta": "3.2. Ubicación de la instalación",
-        "tipo": "radio",
-        "opciones": [
-          "EN VIVIENDA",
-          "EN LOCAL COMUNAL",
-          "EN INSTITUCIÓN EDUCATIVA"
-        ]
-      }
-    ]
-  },
+  "titulo": "3. DATOS PRINCIPALES DE LA INSTALACIÓN RER AUTÓNOMA",
+  "campos": [
+    {
+      "id": "tipo_instalacion",
+      "etiqueta": "3.1. Tipo de instalación",
+      "tipo": "radio",
+      "opciones": ["RER TIPO 1", "RER TIPO 2", "RER TIPO 3"]
+    },
+    {
+      "id": "ubicacion_instalacion",
+      "etiqueta": "3.2. Ubicación de la instalación",
+      "tipo": "radio",
+      "opciones": ["Vivienda", "Local comunal", "Institución educativa", "Otro"]
+    },
+    {
+      "id": "nro_paneles",
+      "etiqueta": "3.3. Número de módulos fotovoltaicos",
+      "tipo": "number"
+    },
+    {
+      "id": "potencia_total_paneles",
+      "etiqueta": "3.4. Potencia total de módulos (Wp)",
+      "tipo": "number"
+    },
+    {
+      "id": "marca_paneles",
+      "etiqueta": "3.5. Marca de los módulos",
+      "tipo": "text"
+    },
+    {
+      "id": "modelo_paneles",
+      "etiqueta": "3.6. Modelo de los módulos",
+      "tipo": "text"
+    },
+    {
+      "id": "cantidad_baterias",
+      "etiqueta": "3.7. Número de baterías",
+      "tipo": "number"
+    },
+    {
+      "id": "capacidad_baterias",
+      "etiqueta": "3.8. Capacidad total (Ah)",
+      "tipo": "number"
+    },
+    {
+      "id": "voltaje_baterias",
+      "etiqueta": "3.9. Voltaje total del banco de baterías (V)",
+      "tipo": "number"
+    },
+    {
+      "id": "tipo_bateria",
+      "etiqueta": "3.10. Tipo de batería",
+      "tipo": "select",
+      "opciones": ["Plomo-ácido", "Gel", "AGM", "Litio", "Otro"]
+    },
+    {
+      "id": "marca_bateria",
+      "etiqueta": "3.11. Marca de la batería",
+      "tipo": "text"
+    },
+    {
+      "id": "modelo_bateria",
+      "etiqueta": "3.12. Modelo de la batería",
+      "tipo": "text"
+    },
+    {
+      "id": "tiene_controlador",
+      "etiqueta": "3.13. ¿Tiene controlador de carga?",
+      "tipo": "radio",
+      "opciones": ["Sí", "No"]
+    },
+    {
+      "id": "tipo_controlador",
+      "etiqueta": "3.14. Tipo de controlador",
+      "tipo": "select",
+      "opciones": ["PWM", "MPPT", "Otro"]
+    },
+    {
+      "id": "marca_controlador",
+      "etiqueta": "3.15. Marca del controlador",
+      "tipo": "text"
+    },
+    {
+      "id": "modelo_controlador",
+      "etiqueta": "3.16. Modelo del controlador",
+      "tipo": "text"
+    },
+    {
+      "id": "tiene_inversor",
+      "etiqueta": "3.17. ¿Tiene inversor?",
+      "tipo": "radio",
+      "opciones": ["Sí", "No"]
+    },
+    {
+      "id": "potencia_inversor",
+      "etiqueta": "3.18. Potencia del inversor (W)",
+      "tipo": "number"
+    },
+    {
+      "id": "marca_inversor",
+      "etiqueta": "3.19. Marca del inversor",
+      "tipo": "text"
+    },
+    {
+      "id": "modelo_inversor",
+      "etiqueta": "3.20. Modelo del inversor",
+      "tipo": "text"
+    },
+    {
+      "id": "observaciones_componentes",
+      "etiqueta": "3.21. Observaciones adicionales sobre los componentes",
+      "tipo": "textarea"
+    }
+  ]
+},
   {
     "titulo": "4. INSPECCIÓN DE COMPONENTES DEL SISTEMA",
     "campos": [
